@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Include meta tag to ensure proper rendering and touch zooming -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta property="og:title" content="Flair Weather" />
+  <meta property="og:image" content="/flairweather.jpg" />
+<meta property="og:description" content="Flair Weather is a source that delivers real time weather information of your current location or any other city around the world."/>
+ 
+  <link rel="stylesheet" href="themes/Amazing.min.css" />
+  <link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+  <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
+  <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+  <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.js"></script>
+  <script src="script.js"></script>
+  <style type="text/css">
+    html *{
+      font-family: Copperplate,Copperplate Gothic Light,fantasy; 
+    }
+    #bimg{
+      background-image: url("abstract4.png");
+      background-repeat: no-repeat;
+      background-color: #cccccc;
+      background-size: 100%;
+      background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+
+    }
+
+    .blur-filter {
+    -webkit-filter: blur(2px);
+    -moz-filter: blur(2px);
+    -o-filter: blur(2px);
+    -ms-filter: blur(2px);
+    filter: blur(2px);
+    }
+    #forecast{
+     background-image: url(weather.png);
+      background-size: 100px;
+      background-repeat: no-repeat;
+      background-position:  center; 
+    padding-bottom: 145px;
+    }
+
+#chart{
+	    padding-bottom: 145px;
+
+background-image: url(graph.png);
+      background-size: 100px;
+      background-repeat: no-repeat;
+      background-position:  center; 
+}
+
+    table{
+      border-spacing: 20px; 
+    }
+    #additionalTable{
+
+    	width:100%;
+    }
+
+    #humPress{
+padding-bottom : 30px;
+padding-right: 120px;
+    	background-image: url("Press-Temp-Hum.bmp");
+    	background-size: 100px;
+      background-repeat: no-repeat;
+      background-position:  center;
+    }
+/*This Code*/
+    #ITDC{
+   
+    }
+    #defaultIcon{
+     float:left;
+    }
+
+.menu-links{
+   background:none;
+    border:none;
+    margin:0;
+    padding:0;
+    font-size: 40px;
+    text-decoration:none;
+    color : white !Important;
+}
+
+
+.menu-links:hover{
+text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #000000 , 0 0 30px #000000 , 0 0 40px #000000 , 0 0 55px #000000 , 0 0 75px #000000 ;
+}
+
+#menuTable{
+  position:fixed;
+  border-spacing: 50px; 
+width:100%;
+}
+
+
+  </style>
+</head>
+<body>
+
+  <div data-role="page" id="pageone">
+    <div data-role="header" id="pageoneHeader">
+    <button class="ui-btn ui-btn-inline ui-icon-bars ui-btn-icon-notext" id="menuButton"></button>
+      <h1>Flair Weather</h1>
+    </div>
+
+    <div data-role="main" class="ui-content" id="bimg">
+ 
+ <div style="width:500px; margin:0 auto;">
+     <img id="defaultIcon" src="" style="display: none;">
+
+     <table id="ITDC">
+     
+     <tr>
+          <td><h1 id="defaultTemperature"></h1></td>
+     </tr>
+     <tr>     
+          <td><h3 id="defaultDescription"></h3></td>
+     </tr>  
+     <tr>   
+          <td><h3 id="defaultCity"></h3></td>
+     </tr>
+
+</table>
+</div>
+<br>  
+ <center><button id="humPress" class="ui-btn ui-btn-inline ui-corner-all" style="display: none;"></button>
+ </center>
+<!--This Code-->
+
+<br>
+      <h3>Enter City Name:</h3>
+      <form id="target" action="">
+        <input type="text" id="cityName" required="Required Field" pattern="[A-Za-z, ]+" title="Only Alphabets In City Name"><br>
+        
+        <input type="submit" value="Search" id="submit">
+      </form>
+      <br></br>
+
+<div data-role="collapsible">
+<h1>Forecast And Graph</h1>
+<center>
+<table id="additionalTable">
+	<tr>
+		<th><button id="forecast">Forecast</button></th>
+		<th><button id="chart">Graph</button></th>
+	</tr>
+</table>
+</center>
+</div>
+
+<br>
+      <div data-role="collapsible" data-collapsed-icon="search">
+        <h1>Recent Searches</h1>
+        <center><p id="NoRecent">No Recent Searches Found</p></center>
+        <ul data-role="listview" id="search">
+        </ul>
+      </div>
+      <br>
+      <div data-role="collapsible" data-collapsed-icon="location">
+<h1>Show On Map</h1>
+        <center><p id="Map">Please Select A City First</p>
+        <iframe id="mapFrame"
+  width="0"
+  height="0"
+  frameborder="0" style="border:0"
+  src="" allowfullscreen>
+</iframe>
+        </center>
+
+</div>
+
+<br>
+    </div>
+
+    <div data-role="footer" id="pageoneFooter">
+      <h1>v1.2</h1>
+    </div>
+    <!-- PopUp For Forecast -->
+    <div data-role="popup" id="myPopup" data-transition="pop">
+      <div data-role="header">
+        <h1 id="popName"></h1>
+      </div>
+      <div role="main" class="ui-content">
+        <center>
+          <!-- Table To Hold Forecast Details -->          
+          <table id="forecastTable">
+            <tr>
+              <th id="time1"></th>
+              <th id="time2"></th>
+              <th id="time3"></th>
+              <th id="time4"></th>
+            </tr>
+
+            <tr>
+              <th id="temp1"></th>
+              <th id="temp2"></th>
+              <th id="temp3"></th>
+              <th id="temp4"></th>
+            </tr>
+
+            <tr>
+              <th id="icon1"></th>
+              <th id="icon2"></th>
+              <th id="icon3"></th>
+              <th id="icon4"></th>
+            </tr>
+
+            <tr>
+              <th id="description1"></th>
+              <th id="description2"></th>
+              <th id="description3"></th>
+              <th id="description4"></th>
+            </tr>
+
+          </table>
+
+        </center>
+        
+      </div>
+    </div>
+
+    <!-- PopUp For Graph -->
+    <center>
+    <div data-role="popup" id="popup2" data-transition="pop">
+      <div data-role="header">
+        <h1 id="popName">Graph Analysis</h1>
+      </div>
+      <div role="main" class="ui-content">
+        <canvas id="myChart" width="400" height="400"></canvas>
+      </div>
+    </div>
+</center>
+
+
+<!-- Popup For Humidity,Pressure -->
+ <div data-role="popup" id="sideDetails" data-transition="pop">
+      <div role="main" class="ui-content">
+<center>
+	<table id="detailsTable">
+		<tr>
+			<th><img src="humidity.png" height="70" width="70"></th>
+			<th><img src="pressure.png" height="70" width="70"></th>
+			<th><img src="temperature.png" height="70" width="70"></th>
+		</tr>
+		<tr>
+			<th>Humidity</th>
+			<th>Pressure</th>
+			<th>Temp</th>
+		</tr>
+		<tr>
+			<th id="humidity"></th>
+			<th id="pressure"></th>
+			<th id="tempMinMax"></th>
+		</tr>
+		<tr>
+			<th><img src="wind.png" height="70" width="70"></th>
+			<th><img src="sun.bmp" height="70" width="70"></th>
+			<th><img src="sunset.png" height="100" width="100"></th>
+		</tr>
+		<tr>
+			<th>Wind</th>
+			<th>Sunrise</th>
+			<th>Sunset</th>
+		</tr>
+		<tr>
+			<th id="wind"></th>
+			<th id="sunrise"></th>
+			<th id="sunset"></th>
+		</tr>
+	</table>
+</center>
+      </div>
+    </div>
+
+  </div> 
+
+<!--Menu Page-->
+<div data-role="page" id="menuPage" style="background-color: black;">
+
+<div data-role="header">
+<button class="ui-btn ui-btn-inline ui-icon-delete ui-btn-icon-notext" id="homeButton" onclick="
+$.mobile.changePage('#pageone',{ transition: 'slideup', changeHash: false });"></button>
+</div>
+
+<div role="main" class="ui-content">
+<br>
+<p></p>
+<br>
+<table id="menuTable">
+<tr>
+  <th><a href="#" id="aboutPageButton" class="menu-links">About</a></th>
+</tr> 
+<tr> 
+  <th><a href="#" id="subscribePageButton" class="menu-links">Subscribe</a></th>
+</tr>  
+<tr>
+  <th><a id="donatePageButton" href="#" class="menu-links">Donate</a></th>
+</tr>  
+<tr> 
+  <th><a href="#" id="creditsPageButton" class="menu-links">Credits</a></th>
+</tr>
+</table>
+
+</div>
+</div>
+
+<!--Credits Page-->
+<div data-role="page" id="creditsPage">
+
+<div data-role="header">
+<button class="ui-btn ui-btn-inline ui-icon-delete ui-btn-icon-notext" id="homeButton" onclick="
+$.mobile.changePage('#pageone',{ transition: 'slideup', changeHash: false });"></button>
+<h1>Credits</h1>
+</div>
+
+<div role="main" class="ui-content">
+
+<h2>Data Sources</h2>
+
+<h4>Weather data:</h4>
+<p>Provided by <a href="http://www.openweathermap.org/api">openweather</a></p>
+
+<h4>Weather Icons:</h4>
+<p>By Ashley Jager</p>
+
+<h4>IP location data:</h4>
+<p>Provided by <a href="https://ipapi.co/">ipapi</a></p>
+
+<h4>Source Code:</h4>
+<p>By Jatin Sharma</p>
+</div>
+
+<div data-role="footer">
+<h3>v1.2</h3>
+</div>
+
+</div>
+
+<!--About Page-->
+<div data-role="page" id="aboutPage">
+<div data-role="header">
+<button class="ui-btn ui-btn-inline ui-icon-delete ui-btn-icon-notext" id="homeButton" onclick="
+$.mobile.changePage('#pageone',{ transition: 'slideup', changeHash: false });"></button>
+<h1>About</h1>
+</div>
+
+<div role="main" class="ui-content">
+<img src="flairweatherlogo.jpg" width="100%">
+
+<h3>Flair Weather is a source that delivers real time weather information of your current location or any other city around the world.</h3>
+<h3>3-Hour forecasts,graphical analysis and a lot more.</h3>
+<h3>Responsive design that allows access on all platforms and all devices(PC,mobile,tablet,etc).   Designed to work on almost all browsers(except Internet Explorer).</h3>
+<h3>All kinds of donations are accepted and will be used to keep this website running.</h3>
+</div>
+
+<div data-role="footer">
+<h3>v1.2</h3>
+</div>
+</div>
+
+<!--Donation Page-->
+<div data-role="page" id="donatePage">
+<div data-role="header">
+<button class="ui-btn ui-btn-inline ui-icon-delete ui-btn-icon-notext" id="homeButton" onclick="
+$.mobile.changePage('#pageone',{ transition: 'slideup', changeHash: false });"
+></button>
+<h1>Donate</h1>
+</div>
+<center>
+<div role="main" class="ui-content">
+<img src="Paytm.jpg" height="150px" width="300px">
+<br><br><br><br>
+<img src="donate.jpeg" height="300px" width="300px">
+</div>
+</center>
+<div data-role="footer">
+<h3>v1.2</h3>
+</div>
+</div>
+
+<!--Subscribe Page-->
+<div data-role="page" id="subscribePage">
+<div data-role="header">
+<button class="ui-btn ui-btn-inline ui-icon-delete ui-btn-icon-notext" id="homeButton" onclick="
+$.mobile.changePage('#pageone',{ transition: 'slideup', changeHash: false });"
+></button>
+<h1>Subscribe</h1>
+</div>
+<center>
+<div role="main" class="ui-content">
+<h1>Coming Soon</h1>
+</div>
+</center>
+<div data-role="footer">
+<h3>v1.2</h3>
+</div>
+</div>
+
+</body>
+</html>

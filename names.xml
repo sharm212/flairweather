@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Weather>
+
+<city>
+	<name>Brampton,Canada</name>
+</city>
+
+<city>
+	<name>Oakville,Canada</name>
+</city>
+
+<city>
+	<name>Mississauga,Canada</name>
+</city>
+
+</Weather>
